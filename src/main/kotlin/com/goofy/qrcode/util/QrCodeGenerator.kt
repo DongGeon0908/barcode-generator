@@ -8,6 +8,8 @@ import java.io.ByteArrayOutputStream
 
 class QrCodeGenerator {
     companion object {
+        private val logger = mu.KotlinLogging.logger {}
+
         fun generateQrCode(model: QrCodeModel): ByteArray {
             return runCatching {
                 val outputStream = ByteArrayOutputStream()
@@ -18,7 +20,10 @@ class QrCodeGenerator {
                 MatrixToImageWriter.writeToStream(bitMatrix, model.fileFormat.name, outputStream, matrixToImageConfig)
 
                 outputStream.toByteArray()
-            }.getOrElse { throw RuntimeException("generate qr code fail") }
+            }.getOrElse {
+                logger.error { "error > ${it.message}" }
+                throw RuntimeException("generate qr code fail")
+            }
         }
     }
 
