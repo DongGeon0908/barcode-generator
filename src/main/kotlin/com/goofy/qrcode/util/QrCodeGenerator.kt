@@ -9,13 +9,16 @@ import java.io.ByteArrayOutputStream
 class QrCodeGenerator {
     companion object {
         fun generateQrCode(model: QrCodeModel): ByteArray {
-            val outputStream = ByteArrayOutputStream()
+            return runCatching {
+                val outputStream = ByteArrayOutputStream()
 
-            val bitMatrix = QRCodeWriter().encode(model.content, BarcodeFormat.QR_CODE, model.width, model.height)
-            val matrixToImageConfig = MatrixToImageConfig(model.onColor, model.offColor)
-            MatrixToImageWriter.writeToStream(bitMatrix, model.fileFormat.name, outputStream, matrixToImageConfig)
+                val bitMatrix = QRCodeWriter().encode(model.content, BarcodeFormat.QR_CODE, model.width, model.height)
+                val matrixToImageConfig = MatrixToImageConfig(model.onColor, model.offColor)
 
-            return outputStream.toByteArray()
+                MatrixToImageWriter.writeToStream(bitMatrix, model.fileFormat.name, outputStream, matrixToImageConfig)
+
+                outputStream.toByteArray()
+            }.getOrElse { throw RuntimeException("generate qr code fail") }
         }
     }
 
